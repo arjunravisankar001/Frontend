@@ -8,9 +8,10 @@ export default function FillFeedback() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
 
+  if (!sessionId) return <div className="text-center text-red-500">Invalid session.</div>;
+
    // 🔒 Handle token and extract user from JWT
   const [userId, setUserId] = useState<string>("");
-  if (!sessionId) return <div className="text-center text-red-500">Invalid session.</div>;
   
   const [feedback, setFeedback] = useState<FillFeedbackRequest>({
     rating: 0,
@@ -36,46 +37,55 @@ export default function FillFeedback() {
 
     // Check registration and feedbackFilled
   useEffect(() => {
+    // Check token first
+    if (isTokenExpired()) {
+      alert("Your session has expired. Please log in again.");
+      navigate("/login");
+      return;
+    }
 
-        if (isTokenExpired()) {
-            alert("Your session has expired. Please log in again.");
-            navigate("/login");
-        } else {
-            setUserId(getUsernameFromToken() || "");
-            if (!userId) {
-            alert("Invalid session. Please log in again.");
-            navigate("/login");
-            }
-        }
+    const username = getUsernameFromToken();
+    if (!username) {
+      alert("Invalid session. Please log in again.");
+      navigate("/login");
+      return;
+    }
 
+    // Set userId if not already set
+    if (userId !== username) {
+      setUserId(username);
+      return; // Exit early and let the effect re-run with the new userId
+    }
+
+    // Only check feedback once userId is properly set
     const checkFeedback = async () => {
-        console.log("Checking feedback for session:", sessionId, "user:", userId);
-        try {
-            const response = await getBySessionIdAndUserId(sessionId, userId);
-            console.log("API response:", response);
+      console.log("Checking feedback for session:", sessionId, "user:", userId);
+      try {
+        const response = await getBySessionIdAndUserId(sessionId, userId);
+        console.log("API response:", response);
 
-            if (response.feedbackFilled) {
-                console.log("Feedback already filled!");
-                setAlreadyFilled(true);
-            }
-        } catch (err: any) {
+        if (response.feedbackFilled) {
+          console.log("Feedback already filled!");
+          setAlreadyFilled(true);
+        }
+      } catch (err: any) {
         console.error("API error caught:", err, typeof err, err?.status);
         if (err?.status === 404) {
-            console.log("User is not registered for this session.");
-            setNotRegistered(true);
-            navigate(`/sessions/${sessionId}/view`);
+          console.log("User is not registered for this session.");
+          setNotRegistered(true);
+          navigate(`/sessions/${sessionId}/view`);
         } else {
-            console.log("Other error occurred:", err);
-            setIsError(true);
+          console.log("Other error occurred:", err);
+          setIsError(true);
         }
-        } finally {
+      } finally {
         console.log("Setting isLoading to false");
         setIsLoading(false);
-        }
+      }
     };
 
     checkFeedback();
-  }, [sessionId, userId]);
+  }, [sessionId, userId, navigate]);
 
   const handleChange = (key: keyof FillFeedbackRequest, value: any) => {
     setFeedback((prev) => ({ ...prev, [key]: value }));
