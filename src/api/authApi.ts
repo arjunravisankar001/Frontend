@@ -13,7 +13,7 @@ export const signup = (body: SignupRequest) => handleAPI(async () => {
 });
 
 export const validateToken = (token: string) => handleAPI(async () => {
-    const { data } = await api.post<ValidationResponse>("/api/auth/validate", { token });
+    const { data } = await api.post<ValidationResponse>("/api/auth/validate?token=" + encodeURIComponent(token), {});
     return data;
 });
 
