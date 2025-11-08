@@ -20,9 +20,14 @@ import ChangePassword from "./pages/auth/ChangePassword";
 import AuthChecker from "./pages/auth/AuthChecker";
 import AuthDashboard from "./pages/auth/Dashboard";
 import AuthTestInterface from "./pages/auth/AuthTestInterface";
-import Dashboard from "./pages/analytics/Dashboard"
+import Dashboard from "./pages/analytics/Dashboard";
+import HomePage from "./pages/HomePage";
 
 const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <HomePage />
+    },
     {
         path: '/login',
         element: <Login />
