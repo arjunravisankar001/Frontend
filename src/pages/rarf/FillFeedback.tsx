@@ -2,14 +2,27 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fillFeedback, getBySessionIdAndUserId } from "../../api/rarfApi"; // adjust import if needed
 import type { FillFeedbackRequest } from "../../types";
+import { getUsernameFromToken, isTokenExpired } from "../../utils/jwtUtils";
 
 export default function FillFeedback() {
-  const { sessionId, userId } = useParams<{ sessionId: string; userId: string }>();
+  const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
 
-  if (!sessionId) return <div className="text-center text-red-500">Invalid session.</div>;
-  if (!userId) return <div className="text-center text-red-500">Invalid user.</div>;
+   // 🔒 Handle token and extract user from JWT
+  const [userId, setUserId] = useState<string>("");
 
+  if (isTokenExpired()) {
+    alert("Your session has expired. Please log in again.");
+    navigate("/login");
+  } else {
+    setUserId(getUsernameFromToken() || "");
+    if (!userId) {
+      alert("Invalid session. Please log in again.");
+      navigate("/login");
+    }
+  }
+  if (!sessionId) return <div className="text-center text-red-500">Invalid session.</div>;
+  
   const [feedback, setFeedback] = useState<FillFeedbackRequest>({
     rating: 0,
     understandableScore: 0,
