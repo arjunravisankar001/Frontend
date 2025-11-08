@@ -1,19 +1,34 @@
 import './StatCard.css';
+import React from 'react';
 
-const StatCard = ({ title, value, icon, type = 'number', loading = false }) => {
-  const formatValue = () => {
+interface StatCardProps {
+  title: string;
+  value: string | number | null | undefined;
+  icon: React.ReactNode;
+  type?: 'number' | 'rating' | 'decimal' | 'session';
+  loading?: boolean;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ 
+  title, 
+  value, 
+  icon, 
+  type = 'number', 
+  loading = false 
+}) => {
+  const formatValue = (): string => {
     if (loading) return '...';
     if (value === null || value === undefined) return 'N/A';
     
     switch (type) {
       case 'rating':
-        return typeof value === 'number' ? value.toFixed(2) : value;
+        return typeof value === 'number' ? value.toFixed(2) : String(value);
       case 'decimal':
-        return typeof value === 'number' ? value.toFixed(1) : value;
+        return typeof value === 'number' ? value.toFixed(1) : String(value);
       case 'session':
-        return value || 'N/A';
+        return String(value) || 'N/A';
       default:
-        return value;
+        return String(value);
     }
   };
 

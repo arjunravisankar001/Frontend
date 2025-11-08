@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import  from '../api/analyticsApi';
+import { getTop3Instructors, getAllAnalytics } from '../../api/analyticsApi';
 import StatCard from './StatCard';
 import UserSearch from './UserSearch';
 import TopInstructors from './TopInstructors';
@@ -7,28 +7,39 @@ import RatingHistogram from './RatingHistogram';
 import AttendanceTimeline from './AttendanceTimeline';
 import './Dashboard.css';
 
-const Dashboard = () => {
-  const [analytics, setAnalytics] = useState(null);
-  const [topInstructors, setTopInstructors] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [topLoading, setTopLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState('');
-  const [error, setError] = useState(null);
+interface Analytics {
+  avgRating: number | null;
+  attendedCount: number | null;
+  conductedCount: number | null;
+  avgAttendance: number | null;
+  bestRatedSession: string | null;
+  bestAttendedSession: string | null;
+  uniqueLearners: number | null;
+  repeatLearners: number | null;
+}
 
-  const hasLoadedTopInstructors = useRef(false);
+const Dashboard: React.FC = () => {
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [topInstructors, setTopInstructors] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [topLoading, setTopLoading] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+
+  const hasLoadedTopInstructors = useRef<boolean>(false);
 
   useEffect(() => {
-      // Prevent double-loading
-      if (hasLoadedTopInstructors.current) return;
-      hasLoadedTopInstructors.current = true;
+    // Prevent double-loading
+    if (hasLoadedTopInstructors.current) return;
+    hasLoadedTopInstructors.current = true;
 
-      loadTopInstructors();
-    }, []);
+    loadTopInstructors();
+  }, []);
 
-  const loadTopInstructors = async () => {
+  const loadTopInstructors = async (): Promise<void> => {
     setTopLoading(true);
     try {
-      const instructors = await analyticsService.getTop3Instructors();
+      const instructors = await getTop3Instructors();
       setTopInstructors(instructors);
     } catch (err) {
       console.error('Error loading top instructors:', err);
@@ -38,13 +49,13 @@ const Dashboard = () => {
     }
   };
 
-  const handleSearch = async (username) => {
+  const handleSearch = async (username: string): Promise<void> => {
     setLoading(true);
     setError(null);
     setCurrentUser(username);
     
     try {
-      const data = await analyticsService.getAllAnalytics(username);
+      const data = await getAllAnalytics(username);
       setAnalytics(data);
     } catch (err) {
       setError('Failed to load analytics. Please check the username and try again.');

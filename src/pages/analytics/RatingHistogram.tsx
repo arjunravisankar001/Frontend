@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react';
 import { getRatingHistogram } from '../../api/analyticsApi';
 import './RatingHistogram.css';
 
-const RatingHistogram = (username: string) => {
+interface RatingHistogramProps {
+  username: string;
+}
+
+const RatingHistogram: React.FC<RatingHistogramProps> = ({ username }) => {
   const [histogram, setHistogram] = useState<number[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (username) {
@@ -13,7 +17,7 @@ const RatingHistogram = (username: string) => {
     }
   }, [username]);
 
-  const loadHistogram = async () => {
+  const loadHistogram = async (): Promise<void> => {
     setLoading(true);
     setError('');
     try {
@@ -49,7 +53,7 @@ const RatingHistogram = (username: string) => {
     );
   }
 
-  if (!histogram) {
+  if (!histogram || histogram.length === 0) {
     return null;
   }
 
@@ -65,7 +69,7 @@ const RatingHistogram = (username: string) => {
       <div className="histogram-bars">
         {histogram.map((count, index) => {
           const rating = index + 1;
-          const percentage = total > 0 ? (count / total * 100).toFixed(1) : 0;
+          const percentage = total > 0 ? (count / total * 100).toFixed(1) : '0';
           const heightPercentage = maxValue > 0 ? (count / maxValue * 100) : 0;
           
           return (

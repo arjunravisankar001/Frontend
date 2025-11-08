@@ -20,6 +20,7 @@ import ChangePassword from "./pages/auth/ChangePassword";
 import AuthChecker from "./pages/auth/AuthChecker";
 import AuthDashboard from "./pages/auth/Dashboard";
 import AuthTestInterface from "./pages/auth/AuthTestInterface";
+import Dashboard from "./pages/analytics/Dashboard"
 
 const router = createBrowserRouter([
     {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
             staleTime: 1000 * 60 * 5, // optional
         });
         },
+    },
+    {
+        path: '/analytics',
+        element: <Dashboard />
     },
     {
         path: "/sessions",

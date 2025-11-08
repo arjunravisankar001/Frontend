@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import { getAttendanceTimeline  } from '../../api/analyticsApi';
+import { getAttendanceTimeline } from '../../api/analyticsApi';
 import './AttendanceTimeline.css';
 
-const AttendanceTimeline = (username: string) => {
+interface AttendanceTimelineProps {
+  username: string;
+}
+
+const AttendanceTimeline: React.FC<AttendanceTimelineProps> = ({ username }) => {
   const [timeline, setTimeline] = useState<number[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (username) {
@@ -13,7 +17,7 @@ const AttendanceTimeline = (username: string) => {
     }
   }, [username]);
 
-  const loadTimeline = async () => {
+  const loadTimeline = async (): Promise<void> => {
     setLoading(true);
     setError('');
     try {
