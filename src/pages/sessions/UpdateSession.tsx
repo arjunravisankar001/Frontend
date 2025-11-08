@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLoaderData } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { updateSession } from "../../api/sessionApi";
 import { queryClient } from "../../queryClient";
 import type { Session, UpdateSessionRequest } from "../../types";
+import { getUsernameFromToken, isTokenExpired } from "../../utils/jwtUtils";
 
 // Reusable TagsInput component
 function TagsInput({ tags, onChange }: { tags: string[]; onChange: (tags: string[]) => void }) {
@@ -62,10 +63,17 @@ function TagsInput({ tags, onChange }: { tags: string[]; onChange: (tags: string
       </div>
     </div>
   );
-};
+}
 
 function validateSession(form: UpdateSessionRequest) {
-  if (!form.title || !form.start || !form.duration || !form.tags || !form.meetingLink || !form.resourcesLink) {
+  if (
+    !form.title ||
+    !form.start ||
+    !form.duration ||
+    !form.tags ||
+    !form.meetingLink ||
+    !form.resourcesLink
+  ) {
     return false;
   }
   return true;
@@ -84,6 +92,35 @@ export default function UpdateSession() {
     resourcesLink: loaderData.resourcesLink,
   });
 
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [message, setMessage] = useState("");
+
+  // Check if user is authorized to edit this session
+  useEffect(() => {
+    if (isTokenExpired()) {
+      alert("Session expired. Please log in again.");
+      navigate("/login");
+      return;
+    }
+
+    const username = getUsernameFromToken();
+
+    if (!username) {
+      alert("Invalid or missing token. Please log in again.");
+      navigate("/login");
+      return;
+    }
+
+    if (loaderData.creatorId !== username) {
+      setUnauthorized(true);
+      setMessage("You are not authorized to edit this session. Redirecting to home...");
+      const timer = setTimeout(() => {
+        navigate("/home");
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [loaderData.creatorId, navigate]);
+
   const mutation = useMutation({
     mutationFn: (data: UpdateSessionRequest) => updateSession(loaderData.id, data),
     onSuccess: (updatedSession) => {
@@ -100,16 +137,28 @@ export default function UpdateSession() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateSession(form)) {
-        alert("Please fill all required fields and add at least one tag.");
-        return;
+      alert("Please fill all required fields and add at least one tag.");
+      return;
     }
     mutation.mutate(form);
   };
 
-  // React Query v5 states
   const isLoading = mutation.status === "pending";
   const isError = mutation.status === "error";
   const error = mutation.error;
+
+  // If unauthorized, show message instead of form
+  if (unauthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-400 to-pink-500 text-white text-center">
+        <div className="bg-white/20 backdrop-blur-lg rounded-2xl p-10 shadow-lg">
+          <h1 className="text-3xl font-bold mb-4">Access Denied</h1>
+          <p className="text-lg">{message}</p>
+          <p className="mt-4 text-sm opacity-80">You will be redirected shortly...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500 py-10 px-4">
@@ -120,7 +169,6 @@ export default function UpdateSession() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* Title */}
           <div>
             <label className="font-semibold text-gray-700">Title</label>
             <input
@@ -132,7 +180,6 @@ export default function UpdateSession() {
             />
           </div>
 
-          {/* Start */}
           <div>
             <label className="font-semibold text-gray-700">Start</label>
             <input
@@ -144,7 +191,6 @@ export default function UpdateSession() {
             />
           </div>
 
-          {/* Duration */}
           <div>
             <label className="font-semibold text-gray-700">Duration (minutes)</label>
             <input
@@ -157,7 +203,6 @@ export default function UpdateSession() {
             />
           </div>
 
-          {/* Tags */}
           <div>
             <label className="font-semibold text-gray-700">Tags</label>
             <TagsInput
@@ -166,7 +211,6 @@ export default function UpdateSession() {
             />
           </div>
 
-          {/* Links */}
           <div>
             <label className="font-semibold text-gray-700">Meeting Link</label>
             <input
@@ -190,7 +234,9 @@ export default function UpdateSession() {
           </div>
 
           {isError && (
-            <div className="text-red-500">Error: {error?.message || "Something went wrong"}</div>
+            <div className="text-red-500">
+              Error: {error?.message || "Something went wrong"}
+            </div>
           )}
 
           <button

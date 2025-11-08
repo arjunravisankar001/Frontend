@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { createSession } from "../../api/sessionApi";
 import type { CreateSessionRequest } from "../../types";
+import { getUsernameFromToken, isTokenExpired } from "../../utils/jwtUtils";
 
 // Reusable TagsInput component
 function TagsInput({ tags, onChange }: { tags: string[]; onChange: (tags: string[]) => void }) {
@@ -76,10 +77,31 @@ export default function CreateSession() {
     resourcesLink: "",
   });
 
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Retrieve username from JWT when component mounts
+    if (isTokenExpired()) {
+      alert("Session expired. Please log in again.");
+      navigate("/login");
+      return;
+    }
+
+    const name = getUsernameFromToken();
+    if (!name) {
+      alert("Could not retrieve username from token. Please log in again.");
+      navigate("/login");
+      return;
+    }
+
+    setUsername(name);
+    setForm((prev) => ({ ...prev, creatorId: name }));
+  }, [navigate]);
+
   const mutation = useMutation({
     mutationFn: (data: CreateSessionRequest) => createSession(data),
     onSuccess: (newSession) => {
-        navigate(`/sessions/${newSession.id}`);
+      navigate(`/sessions/${newSession.id}`);
     },
   });
 
@@ -100,7 +122,6 @@ export default function CreateSession() {
     mutation.mutate(form);
   };
 
-  // React Query v5 states
   const isLoading = mutation.status === "pending";
 
   return (
@@ -112,15 +133,15 @@ export default function CreateSession() {
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {/* Read-only Creator ID Display */}
           <div>
-            <label className="font-semibold text-gray-700">Creator ID*</label>
+            <label className="font-semibold text-gray-700">Creator</label>
             <input
               type="text"
-              name="creatorId"
-              value={form.creatorId}
-              onChange={handleChange}
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
-              required
+              value={username || "Loading..."}
+              readOnly
+              disabled
+              className="w-full mt-1 px-4 py-2 border rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
             />
           </div>
 

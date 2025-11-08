@@ -1,4 +1,4 @@
-import { useLoaderData, Link } from "react-router-dom";
+import { useNavigate, useLoaderData, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getSessionById } from "../../api/sessionApi";
 import {
@@ -8,6 +8,7 @@ import {
   getBySessionIdAndUserId,
 } from "../../api/rarfApi";
 import type { Session, Stats } from "../../types";
+import { isTokenExpired, getUsernameFromToken } from "../../utils/jwtUtils";
 import {
   ResponsiveContainer,
   BarChart,
@@ -33,7 +34,27 @@ export default function ViewSession() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [canFillFeedback, setCanFillFeedback] = useState(false);
 
-  const hardcodedUserId = "arjun"; // TODO: integrate Users later
+  const [userId, setUserId] = useState<string>('');
+  const navigate = useNavigate();
+
+    useEffect(() => {
+      // Retrieve username from JWT when component mounts
+      if (isTokenExpired()) {
+        alert("Session expired. Please log in again.");
+        navigate("/login");
+        return;
+      }
+  
+      const name = getUsernameFromToken();
+      if (!name) {
+        alert("Could not retrieve username from token. Please log in again.");
+        navigate("/login");
+        return;
+      }
+  
+      setUserId(name);
+    }, [navigate]);
+//   const userId = "arjun"; // TODO: integrate Users later
 
   // Fetch session info
   const {
@@ -64,12 +85,12 @@ export default function ViewSession() {
 
         try {
         // Check registration
-        await getBySessionIdAndUserId(session.id, hardcodedUserId);
+        await getBySessionIdAndUserId(session.id, userId);
         setIsRegistered(true);
         console.log("User is registered for this session.");
 
         // Check if feedback can be filled
-        const feedback = await getBySessionIdAndUserId(session.id, hardcodedUserId);
+        const feedback = await getBySessionIdAndUserId(session.id, userId);
         const feedbackFilled = feedback.feedbackFilled;
 
         // canFillFeedback is true only if session is over and feedback is not yet filled
@@ -100,7 +121,7 @@ export default function ViewSession() {
     if (!session) return;
     setIsRegistering(true);
     try {
-      await register({ sessionId: session.id, userId: hardcodedUserId });
+      await register({ sessionId: session.id, userId: userId });
       alert("Successfully registered for this session!");
       setIsRegistered(true);
     } catch (err: any) {
@@ -124,7 +145,7 @@ export default function ViewSession() {
     if (!session) return;
     setIsRegistering(true);
     try {
-      await deleteRarf(session.id, hardcodedUserId);
+      await deleteRarf(session.id, userId);
       alert("You have been deregistered from this session.");
       setIsRegistered(false);
     } catch (err) {
@@ -383,7 +404,7 @@ export default function ViewSession() {
           <div className="flex justify-end gap-4 pt-4">
             {/* Only show Register/Deregister if session hasn't started */}
             {!sessionStarted &&
-            session.creatorId !== hardcodedUserId &&
+            session.creatorId !== userId &&
              (
               <button
                 onClick={isRegistered ? handleDeregister : handleRegister}
@@ -407,7 +428,7 @@ export default function ViewSession() {
             )}
 
             {/* Only show Edit if current user is creator */}
-            {session.creatorId === hardcodedUserId && (
+            {session.creatorId === userId && (
               <Link
                 to={`/sessions/update/${session.id}`}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition transform hover:-translate-y-0.5"
@@ -426,7 +447,7 @@ export default function ViewSession() {
             {/* Fill Feedback Button (only if eligible) */}
             {isRegistered && canFillFeedback && (
                 <Link
-                to={`/feedback/${session.id}/${hardcodedUserId}/fill`}
+                to={`/feedback/${session.id}/fill`}
                 className="bg-purple-500 hover:bg-purple-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition transform hover:-translate-y-0.5"
                 >
                 Fill Feedback

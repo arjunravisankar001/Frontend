@@ -38,18 +38,19 @@ export default function FillFeedback() {
         console.log("Checking feedback for session:", sessionId, "user:", userId);
 
         try {
-        const response = await getBySessionIdAndUserId(sessionId, userId);
-        console.log("API response:", response);
+            const response = await getBySessionIdAndUserId(sessionId, userId);
+            console.log("API response:", response);
 
-        if (response.feedbackFilled) {
-            console.log("Feedback already filled!");
-            setAlreadyFilled(true);
-        }
+            if (response.feedbackFilled) {
+                console.log("Feedback already filled!");
+                setAlreadyFilled(true);
+            }
         } catch (err: any) {
         console.error("API error caught:", err, typeof err, err?.status);
         if (err?.status === 404) {
             console.log("User is not registered for this session.");
             setNotRegistered(true);
+            navigate(`/sessions/${sessionId}/view`);
         } else {
             console.log("Other error occurred:", err);
             setIsError(true);

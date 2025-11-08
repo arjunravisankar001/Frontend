@@ -136,7 +136,7 @@ const router = createBrowserRouter([
         },
     },
     {
-        path: "/feedback/:sessionId/:userId/fill",
+        path: "/feedback/:sessionId/fill",
         element: <FillFeedback />
     },
     {
