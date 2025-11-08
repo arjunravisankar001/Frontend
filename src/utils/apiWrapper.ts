@@ -7,4 +7,4 @@ export async function handleAPI<T>(fn: () => Promise<T>): Promise<T> {
     } catch (err) {
         throw parseAPIError(err);
     }
-}
+};

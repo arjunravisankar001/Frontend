@@ -1,0 +1,145 @@
+.attendance-timeline {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.timeline-header {
+  margin-bottom: 20px;
+}
+
+.timeline-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.timeline-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.timeline-stat {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.timeline-stat strong {
+  color: #333;
+  margin-right: 4px;
+}
+
+.timeline-chart-container {
+  display: flex;
+  gap: 12px;
+  height: 280px;
+  margin-bottom: 12px;
+}
+
+.timeline-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-right: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  min-width: 45px;
+}
+
+.y-axis-label {
+  font-size: 0.85rem;
+  color: #666;
+  text-align: right;
+  font-weight: 500;
+}
+
+.timeline-line-chart {
+  flex: 1;
+  position: relative;
+  border-left: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+  padding: 10px;
+  background: linear-gradient(to top, #fafafa 0%, #ffffff 100%);
+}
+
+.line-chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.grid-line {
+  stroke: #e8e8e8;
+  stroke-width: 1;
+  stroke-dasharray: 4, 4;
+}
+
+.area-path {
+  fill: rgba(245, 87, 108, 0.1);
+}
+
+.line-path {
+  fill: none;
+  stroke: #f5576c;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.data-point-circle {
+  fill: #f5576c;
+  stroke: white;
+  stroke-width: 3;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(245, 87, 108, 0.3));
+}
+
+.data-point-group:hover .data-point-circle {
+  r: 9;
+  fill: #e74c3c;
+  filter: drop-shadow(0 3px 8px rgba(245, 87, 108, 0.6));
+}
+
+.timeline-x-axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 45px 0 57px;
+  margin-top: 8px;
+  position: relative;
+}
+
+.x-axis-label {
+  font-size: 0.8rem;
+  color: #666;
+  position: relative;
+}
+
+.timeline-footer {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.x-axis-title {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.attendance-timeline.loading,
+.attendance-timeline.error {
+  text-align: center;
+  color: #666;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.attendance-timeline.error p {
+  color: #e74c3c;
+}

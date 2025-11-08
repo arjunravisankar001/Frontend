@@ -7,6 +7,19 @@ export interface APIError {
     details?: any;
 };
 
+export function isAPIError(err: any): err is APIError {
+    return (
+        err !== null &&
+        typeof err === "object" &&
+        "status" in err &&
+        "message" in err &&
+        typeof err.status === "number" &&
+        typeof err.message === "string" &&
+        (err.error === undefined || typeof err.error === "string") &&
+        (err.details === undefined || typeof err.details === "object")
+    );
+}; 
+
 /**
  * Converts an AxiosError into a simpler, consistent APIError.
  */
@@ -30,4 +43,4 @@ export function parseAPIError(err: unknown): APIError {
         status: 0,
         message: (err as Error)?.message || "Unknown error",
     };
-}
+};

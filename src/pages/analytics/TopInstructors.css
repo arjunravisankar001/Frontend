@@ -1,0 +1,61 @@
+.top-instructors {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.section-title {
+  font-size: 1.3rem;
+  margin: 0 0 15px 0;
+  color: #333;
+  text-align: center;
+}
+
+.instructors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.instructor-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: white;
+}
+
+.instructor-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.rank {
+  font-size: 1.5rem;
+  font-weight: 700;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.instructor-name {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.loading,
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}

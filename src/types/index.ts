@@ -106,3 +106,65 @@ export interface Stats {
   presenterScore: StatSummary;
   paceScore: StatSummary;
 };
+
+export interface User {
+    name: string;
+    username: string;
+    emailId: string;
+    skillTagList: string[];
+    qualificationList: string[];
+    resumeLink: string;
+    teachList: string[];
+    learnList: string[];
+    selfAccess: boolean;
+};
+
+export interface SearchQueryUser {
+    nameSubstring: string;
+    teachList: string[];
+    learnList: string[];
+};
+
+export interface AuthResponse {
+    token: string;
+    refreshToken: string;
+    username: string;
+    issuedAt: string;
+    expiresAt: string;
+    message: string;
+};
+
+export interface LoginRequest {
+    username: string;
+    password: string;
+};
+
+export interface SignupRequest {
+    username: string;
+    password: string;
+};
+
+export interface UpdatePasswordRequest {
+    username: string;
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+};
+
+export interface GenericResponse {
+    message: string;
+    username: string;
+    timestamp: string;
+};
+
+export interface ValidationResponse {
+    valid: boolean;
+    username: string;
+    message: string;
+};
+
+export interface Health {
+    status: string;
+    service: string;
+    timestamp: string;
+};
