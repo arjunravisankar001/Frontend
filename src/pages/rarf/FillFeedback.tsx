@@ -10,17 +10,6 @@ export default function FillFeedback() {
 
    // 🔒 Handle token and extract user from JWT
   const [userId, setUserId] = useState<string>("");
-
-  if (isTokenExpired()) {
-    alert("Your session has expired. Please log in again.");
-    navigate("/login");
-  } else {
-    setUserId(getUsernameFromToken() || "");
-    if (!userId) {
-      alert("Invalid session. Please log in again.");
-      navigate("/login");
-    }
-  }
   if (!sessionId) return <div className="text-center text-red-500">Invalid session.</div>;
   
   const [feedback, setFeedback] = useState<FillFeedbackRequest>({
@@ -47,9 +36,20 @@ export default function FillFeedback() {
 
     // Check registration and feedbackFilled
   useEffect(() => {
+
+        if (isTokenExpired()) {
+            alert("Your session has expired. Please log in again.");
+            navigate("/login");
+        } else {
+            setUserId(getUsernameFromToken() || "");
+            if (!userId) {
+            alert("Invalid session. Please log in again.");
+            navigate("/login");
+            }
+        }
+
     const checkFeedback = async () => {
         console.log("Checking feedback for session:", sessionId, "user:", userId);
-
         try {
             const response = await getBySessionIdAndUserId(sessionId, userId);
             console.log("API response:", response);
