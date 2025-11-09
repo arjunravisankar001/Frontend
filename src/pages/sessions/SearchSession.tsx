@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getSessionById, getTags, searchSessions } from "../../api/sessionApi";
 import type { Session, SearchSessionRequest } from "../../types";
 import { queryClient } from "../../queryClient";
+import Layout from "../../components/Layout";
 
 const PAGE_SIZE_DEFAULT = 9;
 const FILTER_OPTIONS: (keyof SearchSessionRequest)[] = [
@@ -152,7 +153,7 @@ export default function SearchSession() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500 py-10 px-4">
+    <Layout>
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white text-center py-8 px-6">
@@ -412,6 +413,6 @@ export default function SearchSession() {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };

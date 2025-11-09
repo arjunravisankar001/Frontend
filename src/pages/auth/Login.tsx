@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     const storedUsername = localStorage.getItem('username');
     
     if (token && storedUsername) {
-      navigate(`/dashboard?user=${encodeURIComponent(storedUsername)}`);
+      navigate(`/`);
     }
   }, [navigate]);
 
@@ -45,7 +45,7 @@ const Login: React.FC = () => {
       
       if (result === true) {
         console.log('User profile exists, redirecting to dashboard');
-        navigate(`/dashboard?user=${encodeURIComponent(username)}`);
+        navigate(`/`);
       } else {
         console.log('User profile not found, redirecting to create profile');
         navigate('/users/create');

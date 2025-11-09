@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createSession } from "../../api/sessionApi";
 import type { CreateSessionRequest } from "../../types";
 import { getUsernameFromToken, isTokenExpired } from "../../utils/jwtUtils";
+import Layout from "../../components/Layout";
 
 // Reusable TagsInput component
 function TagsInput({ tags, onChange }: { tags: string[]; onChange: (tags: string[]) => void }) {
@@ -101,7 +102,7 @@ export default function CreateSession() {
   const mutation = useMutation({
     mutationFn: (data: CreateSessionRequest) => createSession(data),
     onSuccess: (newSession) => {
-      navigate(`/sessions/${newSession.id}`);
+      navigate(`/sessions/${newSession.id}/view`);
     },
   });
 
@@ -125,7 +126,7 @@ export default function CreateSession() {
   const isLoading = mutation.status === "pending";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500 py-10 px-4">
+    <Layout>
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white text-center p-10">
           <h1 className="text-3xl font-semibold mb-2">Create Session</h1>
@@ -223,6 +224,6 @@ export default function CreateSession() {
           </button>
         </form>
       </div>
-    </div>
+    </Layout>
   );
 };

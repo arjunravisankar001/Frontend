@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { displayUser } from '../../api/userApi';
 import type { User } from '../../types';
+import Layout from '../../components/Layout';
+import { getUsernameFromToken } from '../../utils/jwtUtils';
 
 interface ProfileFieldProps {
   label: string;
@@ -34,36 +36,25 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, value, isArray = fal
 };
 
 const ViewUser: React.FC = () => {
-  const { queryUsername } = useParams<{ queryUsername: string }>();
+  const { id } = useParams<{ id: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [accessorUsername, setAccessorUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      alert('No authentication token found. Please login.');
+    const username = getUsernameFromToken();
+    if (!username) {
+      alert('Could not get username. Please login again.');
       window.location.href = '/login';
       return;
     }
-
-    let username = '';
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      username = payload.username || payload.sub || '';
-      setAccessorUsername(username);
-    } catch (err) {
-      console.error('Error decoding JWT token:', err);
-      alert('Invalid session. Please login again.');
-      window.location.href = '/login';
-      return;
+    
+    setAccessorUsername(username);
+    if (id) {
+      loadUserProfile(username, id);
     }
-
-    if (queryUsername) {
-      loadUserProfile(username, queryUsername);
-    }
-  }, [queryUsername]);
+  }, [id]);
 
   const loadUserProfile = async (accessor: string, query: string) => {
     try {
@@ -79,6 +70,7 @@ const ViewUser: React.FC = () => {
 
   if (loading) {
     return (
+      <Layout>
       <div className="profile-container">
         <div className="profile-header">
           <h2>User Profile</h2>
@@ -88,11 +80,13 @@ const ViewUser: React.FC = () => {
           <div className="loading">Loading profile information...</div>
         </div>
       </div>
+      </Layout>
     );
   }
 
   if (error) {
     return (
+      <Layout>
       <div className="profile-container">
         <div className="profile-header">
           <h2>User Profile</h2>
@@ -102,6 +96,7 @@ const ViewUser: React.FC = () => {
           <div className="error">{error}</div>
         </div>
       </div>
+      </Layout>
     );
   }
 
@@ -109,9 +104,10 @@ const ViewUser: React.FC = () => {
     return null;
   }
 
-  const isOwnProfile = accessorUsername === queryUsername;
+  const isOwnProfile = accessorUsername === id;
 
   return (
+    <Layout>
     <div className="profile-container">
       <div className="profile-header">
         <h2>User Profile</h2>
@@ -144,8 +140,8 @@ const ViewUser: React.FC = () => {
             <a href="/users/edit" className="edit-button">
               Edit Profile
             </a>
-            <a href="/update-password.html" className="edit-button" style={{ marginLeft: '16px' }}>
-              Update Password
+            <a href="/change-password" className="edit-button" style={{ marginLeft: '16px' }}>
+              Update The Password
             </a>
           </>
         )}
@@ -321,6 +317,7 @@ const ViewUser: React.FC = () => {
         }
       `}</style>
     </div>
+    </Layout>
   );
 };
 

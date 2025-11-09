@@ -6,6 +6,7 @@ import TopInstructors from './TopInstructors';
 import RatingHistogram from './RatingHistogram';
 import AttendanceTimeline from './AttendanceTimeline';
 import './Dashboard.css';
+import Layout from '../../components/Layout';
 
 interface Analytics {
   avgRating: number | null;
@@ -66,6 +67,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
+    <Layout>
     <div className="dashboard">
       <header className="dashboard-header">
         <h1>📊 Choroid Analytics Dashboard</h1>
@@ -181,6 +183,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

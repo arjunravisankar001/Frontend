@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllSessions, getSessionById } from "../api/sessionApi";
 import type { Session } from "../types";
 import { queryClient } from "../queryClient";
+import Layout from "../components/Layout";
 
 export default function AllSessions() {
   const { data: sessions = [], isLoading, isError } = useQuery<Session[]>({
@@ -26,17 +27,23 @@ export default function AllSessions() {
   };
 
   if (isLoading)
-    return <div className="text-center text-gray-500 italic py-10">Loading sessions...</div>;
+    return (
+      <Layout>
+        <div className="text-center text-gray-500 italic py-10">Loading sessions...</div>
+      </Layout>
+    );
 
   if (isError)
     return (
-      <div className="error text-center mx-auto max-w-md">
-        Failed to load sessions. Please try again.
-      </div>
+      <Layout>
+        <div className="error text-center mx-auto max-w-md">
+          Failed to load sessions. Please try again.
+        </div>
+      </Layout>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500 py-10 px-4">
+    <Layout>
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white text-center py-8 px-6">
           <h1 className="text-3xl font-semibold mb-2">All Sessions</h1>
@@ -115,6 +122,6 @@ export default function AllSessions() {
           )}
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };

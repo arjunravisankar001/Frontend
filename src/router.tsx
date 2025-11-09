@@ -70,9 +70,22 @@ const router = createBrowserRouter([
         loader: async ({ params }) => {
             const id = params.id;
             if (!id) throw new Error("No username");
+            
+            // Get accessor username from JWT
+            const token = localStorage.getItem('jwtToken');
+            if (!token) throw new Error("No authentication token");
+            
+            let accessorId = '';
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                accessorId = payload.username || payload.sub || '';
+            } catch (err) {
+                throw new Error("Invalid token");
+            }
+            
             return await queryClient.ensureQueryData({
             queryKey: ["user", id],
-            queryFn: () => displayUser(id, id),
+            queryFn: () => displayUser(accessorId, id),
             staleTime: 1000 * 60 * 5, // optional
         });
         },

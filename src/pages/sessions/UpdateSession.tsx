@@ -125,7 +125,7 @@ export default function UpdateSession() {
     mutationFn: (data: UpdateSessionRequest) => updateSession(loaderData.id, data),
     onSuccess: (updatedSession) => {
       queryClient.setQueryData(["session", loaderData.id], updatedSession);
-      navigate(`/sessions/${loaderData.id}`);
+      navigate(`/sessions/${loaderData.id}/view`);
     },
   });
 

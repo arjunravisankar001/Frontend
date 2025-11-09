@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { searchSessions, getSessionById } from "../api/sessionApi";
 import { getByUserId } from "../api/rarfApi";
@@ -6,28 +6,17 @@ import type { Session } from "../types";
 import { useEffect, useState } from "react";
 import { getUsernameFromToken, isTokenExpired } from "../utils/jwtUtils";
 import { queryClient } from "../queryClient";
+import Layout from "../components/Layout";
 
 export default function HomePage() {
-  const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (isTokenExpired()) {
-      alert("Session expired. Please log in again.");
-      navigate("/login");
-      return;
-    }
-
     const name = getUsernameFromToken();
-    if (!name) {
-      alert("Could not retrieve username from token. Please log in again.");
-      navigate("/login");
-      return;
+    if (name) {
+      setUsername(name);
     }
-
-    setUsername(name);
-  }, [navigate]);
+  }, []);
 
   const currentTime = new Date().toISOString();
 
@@ -158,111 +147,85 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500">
-      {/* Topbar */}
-      <div className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden text-indigo-600 hover:text-indigo-800 focus:outline-none"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
-            </button>
-            <h1 className="text-xl font-bold text-indigo-700">
-              Choroid
-            </h1>
-            <div className="flex gap-3">
-              <Link
-                to={`/users/view/${username}`}
-                className="bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Profile
-              </Link>
-              <Link
-                to="/change-password"
-                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Change Password
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex">
-        {/* Sidebar */}
-        <div
-          className={`${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out`}
-        >
-          <div className="h-full flex flex-col">
-            <div className="p-6 bg-gradient-to-r from-indigo-600 to-purple-700">
-              <h2 className="text-white text-2xl font-bold">Navigation</h2>
-            </div>
-            <nav className="flex-1 p-4 space-y-2">
-              <Link
-                to="/sessions"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 font-medium transition"
-              >
-                All Sessions
-              </Link>
-              <Link
-                to="/sessions/create"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 font-medium transition"
-              >
-                Create New Session
-              </Link>
-              <Link
-                to="/sessions/search"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 font-medium transition"
-              >
-                Search Sessions
-              </Link>
-              <Link
-                to="/users/search"
-                className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 font-medium transition"
-              >
-                Search Users
-              </Link>
-            </nav>
-          </div>
-        </div>
-
-        {/* Overlay for mobile */}
-        {sidebarOpen && (
-          <div
-            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-        )}
-
-        {/* Main Content */}
-        <div className="flex-1 p-6 lg:p-10">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white text-center py-8 px-6">
-                <h1 className="text-4xl font-bold mb-2">
-                  Choroid - The learning platform for your everyday needs
-                </h1>
-                <p className="opacity-90 text-lg">Welcome back, {username}!</p>
+    <Layout>
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Welcome Header with Quick Stats */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white py-10 px-6">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-5xl font-bold mb-3 tracking-tight">
+                Welcome back, {username}!
+              </h1>
+              <p className="opacity-90 text-xl mb-6">
+                Your learning journey continues
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl font-bold">{conductedPast.length}</div>
+                  <div className="text-sm opacity-90">Sessions Taught</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl font-bold">{attendedPast.length}</div>
+                  <div className="text-sm opacity-90">Sessions Attended</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl font-bold">{conductedUpcoming.length}</div>
+                  <div className="text-sm opacity-90">Upcoming to Teach</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl font-bold">{attendedUpcoming.length}</div>
+                  <div className="text-sm opacity-90">Upcoming to Attend</div>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Four Columns of Sessions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {/* Quick Actions */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              to="/sessions/create"
+              className="flex items-center gap-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white p-6 rounded-xl shadow-md transition transform hover:-translate-y-1"
+            >
+              <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <div>
+                <div className="font-bold text-lg">Create Session</div>
+                <div className="text-sm opacity-90">Start teaching</div>
+              </div>
+            </Link>
+            <Link
+              to="/sessions/search"
+              className="flex items-center gap-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-6 rounded-xl shadow-md transition transform hover:-translate-y-1"
+            >
+              <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <div>
+                <div className="font-bold text-lg">Find Sessions</div>
+                <div className="text-sm opacity-90">Discover and learn</div>
+              </div>
+            </Link>
+            <Link
+              to="/users/search"
+              className="flex items-center gap-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white p-6 rounded-xl shadow-md transition transform hover:-translate-y-1"
+            >
+              <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <div>
+                <div className="font-bold text-lg">Connect</div>
+                <div className="text-sm opacity-90">Find mentors</div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Four Columns of Sessions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               {/* Column 1: Past Conducted Sessions */}
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h2 className="text-xl font-bold text-indigo-700 mb-4 border-b pb-2">
@@ -321,11 +284,9 @@ export default function HomePage() {
                     {attendedUpcoming.map(renderSessionCard)}
                   </ul>
                 )}
-              </div>
-            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

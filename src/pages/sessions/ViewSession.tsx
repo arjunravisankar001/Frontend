@@ -9,6 +9,7 @@ import {
 } from "../../api/rarfApi";
 import type { Session, Stats } from "../../types";
 import { isTokenExpired, getUsernameFromToken } from "../../utils/jwtUtils";
+import Layout from "../../components/Layout";
 import {
   ResponsiveContainer,
   BarChart,
@@ -108,8 +109,10 @@ export default function ViewSession() {
         }
     };
 
-    checkRegistrationAndFeedback();
-    }, [session]);
+    if (userId) {
+      checkRegistrationAndFeedback();
+    }
+    }, [session, userId]);
 
 
   // Determine if session has already started
@@ -172,20 +175,24 @@ export default function ViewSession() {
 
   if (isSessionLoading)
     return (
-      <div className="text-center text-gray-500 italic py-10">
-        Loading session...
-      </div>
+      <Layout>
+        <div className="text-center text-gray-500 italic py-10">
+          Loading session...
+        </div>
+      </Layout>
     );
 
   if (isSessionError || !session)
     return (
-      <div className="error text-center mx-auto max-w-md">
-        Failed to load session details. Please try again.
-      </div>
+      <Layout>
+        <div className="error text-center mx-auto max-w-md">
+          Failed to load session details. Please try again.
+        </div>
+      </Layout>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 to-purple-500 py-10 px-4">
+    <Layout>
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white text-center p-10">
@@ -456,6 +463,6 @@ export default function ViewSession() {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };

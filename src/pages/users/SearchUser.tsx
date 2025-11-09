@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { searchUser, getTeachList, getLearnList } from '../../api/userApi';
 import type { User, SearchQueryUser } from '../../types';
+import Layout from '../../components/Layout';
+import { getUsernameFromToken } from '../../utils/jwtUtils';
 
 interface UserCardProps {
   user: User;
@@ -83,35 +85,30 @@ const SearchUser: React.FC = () => {
       return;
     }
 
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      alert('No authentication token found. Please login.');
+    const accessorUsername = getUsernameFromToken();
+    if (!accessorUsername) {
+      alert('Could not get username. Please login again.');
       window.location.href = '/login';
       return;
     }
 
-    let accessorUsername = '';
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      accessorUsername = payload.username || payload.sub || '';
-    } catch (err) {
-      console.error('Error decoding JWT token:', err);
-      alert('Invalid session. Please login again.');
-      window.location.href = '/login';
-      return;
+    const searchQuery: Partial<SearchQueryUser> = {};
+    
+    if (nameInput.trim()) {
+      searchQuery.nameSubstring = nameInput.trim();
     }
-
-    const searchQuery: SearchQueryUser = {
-      nameSubstring: nameInput.trim() || '',
-      teachList: selectedTeachTopics.length > 0 ? selectedTeachTopics : [],
-      learnList: selectedLearnTopics.length > 0 ? selectedLearnTopics : []
-    };
+    if (selectedTeachTopics.length > 0) {
+      searchQuery.teachList = selectedTeachTopics;
+    }
+    if (selectedLearnTopics.length > 0) {
+      searchQuery.learnList = selectedLearnTopics;
+    }
 
     setLoading(true);
     setShowResults(true);
 
     try {
-      const users = await searchUser(accessorUsername, searchQuery);
+      const users = await searchUser(accessorUsername, searchQuery as SearchQueryUser);
       setSearchResults(users);
     } catch (err) {
       console.error('Error searching users:', err);
@@ -126,6 +123,7 @@ const SearchUser: React.FC = () => {
   };
 
   return (
+    <Layout>
     <div className="search-container">
       <div className="search-header">
         <h2>Search Users</h2>
@@ -265,6 +263,8 @@ const SearchUser: React.FC = () => {
         .search-form {
           padding: 32px;
           border-bottom: 2px solid #e5e7eb;
+          display: flex;
+          flex-direction: column;
         }
 
         .search-field {
@@ -457,6 +457,7 @@ const SearchUser: React.FC = () => {
         }
       `}</style>
     </div>
+    </Layout>
   );
 };
 
