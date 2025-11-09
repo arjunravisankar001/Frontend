@@ -70,17 +70,17 @@ const AuthDashboard: React.FC = () => {
       const result = await validateToken(token);
       
       if (!isAPIError(result)) {
-        updateAuthStatus(result.valid, result.message);
+        updateAuthStatus(result.valid);
       } else {
-        updateAuthStatus(false, 'Unable to validate session');
+        updateAuthStatus(false);
       }
     } catch (error) {
       console.error('Session validation error:', error);
-      updateAuthStatus(false, 'Unable to validate session');
+      updateAuthStatus(false);
     }
   };
 
-  const updateAuthStatus = (isValid: boolean, message: string) => {
+  const updateAuthStatus = (isValid: boolean) => {
     if (isValid) {
       setAuthStatus({
         isValid: true,
@@ -142,7 +142,6 @@ const AuthDashboard: React.FC = () => {
 
   const handleTestAuth = async () => {
     const token = getToken();
-    const user = getUsername();
 
     if (!token) {
       alert('❌ No authentication token available');

@@ -4,7 +4,7 @@ import { searchSessions, getSessionById } from "../api/sessionApi";
 import { getByUserId } from "../api/rarfApi";
 import type { Session } from "../types";
 import { useEffect, useState } from "react";
-import { getUsernameFromToken, isTokenExpired } from "../utils/jwtUtils";
+import { getUsernameFromToken } from "../utils/jwtUtils";
 import { queryClient } from "../queryClient";
 import Layout from "../components/Layout";
 

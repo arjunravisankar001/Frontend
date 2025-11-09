@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { login, signup, validateToken, getHealth } from '../../api/authApi';
-import type { AuthResponse } from '../../types';
 import { isAPIError } from '../../utils/apiError';
 
 interface LogEntry {
@@ -208,11 +207,6 @@ GET /api/auth/health
 - Error handling
     `;
     addLog(docs, 'info');
-  };
-
-  const getLogClassName = (type: LogEntry['type']) => {
-    const baseClasses = 'response-box';
-    return `${baseClasses} ${type}`;
   };
 
   return (
